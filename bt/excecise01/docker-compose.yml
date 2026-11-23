@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  github-runner:
+    image: my-github-runner:latest  # ← Thay bằng ảnh Runner bạn đang dùng
+    container_name: self-hosted-runner
+    restart: always
+    
+    volumes:
+      # ✅ Dòng quan trọng nhất: chia sẻ socket Docker vào container
+      - /var/run/docker.sock:/var/run/docker.sock
+      
+      # (Tùy chọn) Thư mục làm việc của Runner
+      - ./workdir:/actions-runner/_work
+    
+    environment:
+      - RUNNER_NAME=my-runner
+      - RUNNER_WORK_DIRECTORY=_work
+
+# Lưu ý: Không cần cài Docker bên trong container nữa — nó sẽ dùng Docker của máy chủ

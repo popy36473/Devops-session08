@@ -1,0 +1,31 @@
+name: Pull Image from GHCR
+
+on:
+  push:
+    branches: [ main ]  # Hoặc master
+  workflow_dispatch:    # Cho phép chạy thủ công trên giao diện GitHub
+
+# ✅ Quan trọng: Cấu hình quyền cho GITHUB_TOKEN
+permissions:
+  packages: read        # Được phép đọc gói ảnh từ GHCR
+  contents: read        # Đọc mã nguồn repo
+
+jobs:
+  pull-and-run:
+    runs-on: ubuntu-latest
+    steps:
+      # Bước 1: Đăng nhập vào GHCR dùng GITHUB_TOKEN mặc định
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Bước 2: Kéo ảnh về
+      - name: Pull Docker image
+        run: docker pull ghcr.io/popy36473/payment-service:1.0.0
+
+      # Bước 3: Kiểm tra ảnh đã có
+      - name: Verify image
+        run: docker images | grep payment-service
